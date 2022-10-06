@@ -53,11 +53,11 @@ def main(args: list[str]) -> int:
     parser.add_argument('-a', "--accumulate", action="store_true", help="show the graph for the accumulated probability")
     parser.add_argument('-i', "--invert", action="store_true", help="invert the lengths of the printed bars")
     parsed = parser.parse_args()
-    p = parsed.p
+    p = parsed.probability
     if not 0 <= p <= 1:
         print(f"Error: p musst be between 0 and 1")
         return 1
-    print_hist(parsed.n, p, term_width=parsed.w, accumulated=parsed.a, invert=parsed.i)
+    print_hist(parsed.n, p, term_width=parsed.width, accumulated=parsed.accumulate, invert=parsed.invert)
     return 0
 
 if __name__ == "__main__":
