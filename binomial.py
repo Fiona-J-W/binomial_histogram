@@ -22,7 +22,7 @@ def get_width(term_width: Optional[int]) -> int:
     return term_width
 
 
-def print_hist(n:int, p: Fraction, term_width: Optional[int] = None) -> None:
+def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False, invert: bool = False) -> None:
     wp = len(str(choose(n, n//2)))
     wn = len(str(n))
     mode = int(n*p + p)
@@ -37,20 +37,27 @@ def print_hist(n:int, p: Fraction, term_width: Optional[int] = None) -> None:
             pos = pos_prev * (n-i+1) // (i)
             ratio = ratio * pos * p / pos_prev / (1-p)
         accum_p += ratio
-        print(f"{i:{wn}}: {pos:{wp}} {float(ratio):7.2%} {float(accum_p):7.2%} {float(1-accum_p):7.2%} " + '━' * round(hist_width * ratio/max_ratio))
+        desc = f"{i:{wn}}: {pos:{wp}} {float(ratio):7.2%} {float(accum_p):7.2%} {float(1-accum_p):7.2%} "
+        relative_length = ratio/max_ratio if not accumulated else accum_p
+        if invert:
+            relative_length = 1 - relative_length
+        bar = '━' * round(hist_width * relative_length)
+        print(desc + bar)
 
 
 def main(args: list[str]) -> int:
     parser = argparse.ArgumentParser(args[0])
-    parser.add_argument('-n', type=int)
-    parser.add_argument('-p', type=Fraction, default=Fraction(1,2))
-    parser.add_argument('-w', type=int, default=None)
+    parser.add_argument('n', type=int, help="The number of coin tosses")
+    parser.add_argument('-p', "--probability", type=Fraction, default=Fraction(1,2), help="set the probability of a coin toss resulting in 1")
+    parser.add_argument('-w', "--width", type=int, default=None, help="set the width of the output, defaults to terminal-width if available")
+    parser.add_argument('-a', "--accumulate", action="store_true", help="show the graph for the accumulated probability")
+    parser.add_argument('-i', "--invert", action="store_true", help="invert the lengths of the printed bars")
     parsed = parser.parse_args()
     p = parsed.p
     if not 0 <= p <= 1:
         print(f"Error: p musst be between 0 and 1")
         return 1
-    print_hist(parsed.n, Fraction(p), term_width=parsed.w)
+    print_hist(parsed.n, p, term_width=parsed.w, accumulated=parsed.a, invert=parsed.i)
     return 0
 
 if __name__ == "__main__":
