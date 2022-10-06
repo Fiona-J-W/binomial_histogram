@@ -22,6 +22,13 @@ def get_width(term_width: Optional[int]) -> int:
     return term_width
 
 
+def make_bar(p: Fraction, max: int) -> str:
+    l8 = round(p*max*8)
+    ld, lm =divmod(l8, 8)
+    end = ['', '▏', '▎', '▍', '▌', '▋', '▊', '▉'][lm]
+    return '█' * ld + end
+
+
 def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False, invert: bool = False, min: Fraction = Fraction(0)) -> None:
     wp = len(str(choose(n, n//2)))
     wn = len(str(n))
@@ -43,7 +50,7 @@ def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated
         relative_length = ratio/max_ratio if not accumulated else accum_p
         if invert:
             relative_length = 1 - relative_length
-        bar = '━' * round(hist_width * relative_length)
+        bar = make_bar(relative_length, hist_width)
         print(desc + bar)
 
 
