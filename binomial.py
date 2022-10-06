@@ -1,24 +1,18 @@
 #! /usr/bin/python3
 
-from math import factorial
-from functools import reduce
-from operator import mul
 from os import get_terminal_size
 from typing import Optional
 from fractions import Fraction
 import argparse
 
-def choose(n: int, k: int) -> int:
-    assert n >= k >= 0
-    return reduce(mul, range(n-k+1, n+1), 1) // factorial(k)
-
 def print_hist(n:int, p: Fraction, term_width: Optional[int] = None) -> None:
-    possibilities = []
-    ratios = []
-    for i in range(0, n+1):
-        bc = choose(n, i)
-        ratio = bc * (p**i * (1-p)**(n-i))
-        possibilities.append(bc)
+    possibilities = [1]
+    ratios = [(1-p)**n]
+    for i in range(1, n+1):
+        pos_prev = possibilities[-1]
+        pos = pos_prev * (n-i+1) // (i)
+        ratio = ratios[-1] * pos * p / pos_prev / (1-p)
+        possibilities.append(pos)
         ratios.append(ratio)
     max_possibilities = possibilities[n//2]
     max_ratio = max(ratios)
