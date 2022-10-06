@@ -22,7 +22,7 @@ def get_width(term_width: Optional[int]) -> int:
     return term_width
 
 
-def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False, invert: bool = False) -> None:
+def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False, invert: bool = False, min: Fraction = Fraction(0)) -> None:
     wp = len(str(choose(n, n//2)))
     wn = len(str(n))
     mode = int(n*p + p)
@@ -37,6 +37,8 @@ def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated
             pos = pos_prev * (n-i+1) // (i)
             ratio = ratio * pos * p / pos_prev / (1-p)
         accum_p += ratio
+        if ratio < min:
+            continue
         desc = f"{i:{wn}}: {pos:{wp}} {float(ratio):7.2%} {float(accum_p):7.2%} {float(1-accum_p):7.2%} "
         relative_length = ratio/max_ratio if not accumulated else accum_p
         if invert:
@@ -49,15 +51,16 @@ def main(args: list[str]) -> int:
     parser = argparse.ArgumentParser(args[0])
     parser.add_argument('n', type=int, help="The number of coin tosses")
     parser.add_argument('-p', "--probability", type=Fraction, default=Fraction(1,2), help="set the probability of a coin toss resulting in 1")
-    parser.add_argument('-w', "--width", type=int, default=None, help="set the width of the output, defaults to terminal-width if available")
+    parser.add_argument('-w', "--width", type=int, default=None, help="set the width of the output, defaults to terminal-width if available and 100 otherwise")
     parser.add_argument('-a', "--accumulate", action="store_true", help="show the graph for the accumulated probability")
     parser.add_argument('-i', "--invert", action="store_true", help="invert the lengths of the printed bars")
+    parser.add_argument('-m', "--min", type=Fraction, default=Fraction(0), help="minimum probability needed for a value to be printed")
     parsed = parser.parse_args()
     p = parsed.probability
     if not 0 <= p <= 1:
         print(f"Error: p musst be between 0 and 1")
         return 1
-    print_hist(parsed.n, p, term_width=parsed.width, accumulated=parsed.accumulate, invert=parsed.invert)
+    print_hist(parsed.n, p, term_width=parsed.width, accumulated=parsed.accumulate, invert=parsed.invert, min=parsed.min)
     return 0
 
 if __name__ == "__main__":
