@@ -29,12 +29,13 @@ def make_bar(p: Fraction, max: int) -> str:
     return '█' * ld + end
 
 
-def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False, invert: bool = False, min: Fraction = Fraction(0)) -> None:
+def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False, prec:int = 2, invert: bool = False, min: Fraction = Fraction(0)) -> None:
     wp = len(str(choose(n, n//2)))
     wn = len(str(n))
+    wper = 5 + prec
     mode = int(n*p + p)
     max_ratio = choose(n, mode) * p**mode * (1-p)**(n-mode)
-    hist_width = get_width(term_width) - 27 - wp - wn
+    hist_width = get_width(term_width) - 6 - wp - wn - 3*wper
     accum_p = Fraction(0)
     accum_m = Fraction(1)
     pos = 1
@@ -48,7 +49,7 @@ def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated
         if ratio < min:
             accum_m -= ratio
             continue
-        desc = f"{i:{wn}}: {pos:{wp}} {float(ratio):7.2%} {float(accum_p):7.2%} {float(accum_m):7.2%} "
+        desc = f"{i:{wn}}: {pos:{wp}} {float(ratio):{wper}.{prec}%} {float(accum_p):{wper}.{prec}%} {float(accum_m):{wper}.{prec}%} "
         relative_length = ratio/max_ratio
         if accumulated and not invert:
             relative_length = accum_p
@@ -63,6 +64,7 @@ def main(args: list[str]) -> int:
     parser = argparse.ArgumentParser(args[0])
     parser.add_argument('n', type=int, help="The number of coin tosses")
     parser.add_argument('-p', "--probability", type=Fraction, default=Fraction(1,2), help="set the probability of a coin toss resulting in 1")
+    parser.add_argument('-P', "--precission", type=int, default=2, help="set how many decimals will be printed for percents")
     parser.add_argument('-w', "--width", type=int, default=None, help="set the width of the output, defaults to terminal-width if available and 100 otherwise")
     parser.add_argument('-a', "--accumulate", action="store_true", help="show the graph for the accumulated probability")
     parser.add_argument('-i', "--invert", action="store_true", help="invert the lengths of the printed bars")
@@ -72,7 +74,12 @@ def main(args: list[str]) -> int:
     if not 0 <= p <= 1:
         print(f"Error: p musst be between 0 and 1")
         return 1
-    print_hist(parsed.n, p, term_width=parsed.width, accumulated=parsed.accumulate, invert=parsed.invert, min=parsed.min)
+    print_hist(parsed.n, p,
+            prec=parsed.precission,
+            term_width=parsed.width,
+            accumulated=parsed.accumulate,
+            invert=parsed.invert,
+            min=parsed.min)
     return 0
 
 if __name__ == "__main__":
