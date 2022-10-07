@@ -1,4 +1,5 @@
 from fractions import Fraction
+from decimal import localcontext, Decimal
 
 exp_table = {
     '0': '⁰',
@@ -46,7 +47,7 @@ def scientific_length_max(n: int, prec: int) -> int:
 
 def to_scientific(n: int, prec: int = 2, space: int = 10) -> str:
     exp_space = space - 5 - prec
-    assert prec >= 1
+    assert prec >= 0
     digits = comp_digits(n)
     if digits <= space:
         return f"{n:{space}}"
@@ -65,4 +66,11 @@ def to_percent(x: Fraction, prec: int) -> str:
         prec = 0
     else:
         wper = 5 + prec
-    return f"{float(x):{wper}.{prec}%}"
+
+    if prec < 16:
+        return f"{float(x):{wper}.{prec}%}"
+    else:
+        with localcontext() as ctx:
+            ctx.prec = prec + 2
+            return f"{(Decimal(x.numerator) / Decimal(x.denominator)):{wper}.{prec}%}"
+
