@@ -6,6 +6,7 @@ from operator import mul
 from os import get_terminal_size
 from typing import Optional
 from fractions import Fraction
+from decimal import Decimal
 import argparse
 
 
@@ -32,15 +33,17 @@ def make_bar(p: Fraction, max: int) -> str:
 
 def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False,
                prec: int = 2, invert: bool = False, min: Fraction = Fraction(0)) -> None:
-    wp = len(str(choose(n, n // 2)))
-    wn = len(str(n))
     if prec <= 0:
         wper = 4
         prec = 0
     else:
         wper = 5 + prec
     mode = int(n * p + p)
-    max_ratio = choose(n, mode) * p**mode * (1 - p)**(n - mode)
+    max_pos = choose(n, mode)
+    max_ratio = max_pos * p**mode * (1 - p)**(n - mode)
+    wp_exp = len(str(len(str(max_pos))))
+    wp = wp_exp + prec + 4
+    wn = len(str(n))
     hist_width = get_width(term_width) - 6 - wp - wn - 3 * wper
     accum_p = Fraction(0)
     accum_m = Fraction(1)
@@ -55,7 +58,7 @@ def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulate
         if ratio < min:
             accum_m -= ratio
             continue
-        desc = f"{i:{wn}}: {pos:{wp}}"\
+        desc = f"{i:{wn}}: {Decimal(pos):{wp}.{prec}e}"\
             + f" {float(ratio):{wper}.{prec}%}"\
             + f" {float(accum_p):{wper}.{prec}%}"\
             + f" {float(accum_m):{wper}.{prec}%} "
