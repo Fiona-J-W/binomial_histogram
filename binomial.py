@@ -30,9 +30,9 @@ def make_bar(p: Fraction, max: int) -> str:
 
 def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False,
                prec: int = 2, invert: bool = False, min: Fraction = Fraction(0)) -> None:
+    max_pos = comb(n, n//2)
     mode = int(n * p + p)
-    max_pos = comb(n, mode)
-    max_ratio = max_pos * p**mode * (1 - p)**(n - mode)
+    max_ratio = comb(n, mode) * p**mode * (1 - p)**(n - mode)
     wp = scientific_length_max(max_pos, prec)
     wn = len(str(n))
     hist_width = get_width(term_width) - 6 - wp - wn - 3 * percent_length_max(prec)

@@ -48,6 +48,7 @@ def scientific_length_max(n: int, prec: int) -> int:
     return min(5 + prec + exp_space, raw_length)
 
 def to_scientific(n: int, prec: int = 2, space: int = 10) -> str:
+    #assert space >= 5 + prec
     exp_space = space - 5 - prec
     assert prec >= 0
     digits = comp_digits(n)
