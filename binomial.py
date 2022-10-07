@@ -6,7 +6,7 @@ from operator import mul
 from os import get_terminal_size
 from typing import Optional
 from fractions import Fraction
-from decimal import Decimal
+from bigint_tools import to_scientific, scientific_length_max
 import argparse
 
 
@@ -41,8 +41,7 @@ def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulate
     mode = int(n * p + p)
     max_pos = choose(n, mode)
     max_ratio = max_pos * p**mode * (1 - p)**(n - mode)
-    wp_exp = len(str(len(str(max_pos))))
-    wp = wp_exp + prec + 4
+    wp = scientific_length_max(max_pos, prec)
     wn = len(str(n))
     hist_width = get_width(term_width) - 6 - wp - wn - 3 * wper
     accum_p = Fraction(0)
@@ -58,7 +57,7 @@ def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulate
         if ratio < min:
             accum_m -= ratio
             continue
-        desc = f"{i:{wn}}: {Decimal(pos):{wp}.{prec}e}"\
+        desc = f"{i:{wn}}: {to_scientific(pos, prec, wp)}"\
             + f" {float(ratio):{wper}.{prec}%}"\
             + f" {float(accum_p):{wper}.{prec}%}"\
             + f" {float(accum_m):{wper}.{prec}%} "
