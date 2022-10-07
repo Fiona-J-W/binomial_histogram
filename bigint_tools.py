@@ -1,3 +1,4 @@
+from fractions import Fraction
 
 exp_table = {
     '0': '⁰',
@@ -54,3 +55,14 @@ def to_scientific(n: int, prec: int = 2, space: int = 10) -> str:
     decimals=leading[1:]
     exp = to_exp(digits-1, exp_space)
     return f"{leading_digit}.{decimals}⋅10{exp}"
+
+def percent_length_max(prec: int) -> int:
+    return 4 if prec <= 0 else 5+prec
+
+def to_percent(x: Fraction, prec: int) -> str:
+    if prec <= 0:
+        wper = 4
+        prec = 0
+    else:
+        wper = 5 + prec
+    return f"{float(x):{wper}.{prec}%}"

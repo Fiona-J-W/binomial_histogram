@@ -6,7 +6,7 @@ from operator import mul
 from os import get_terminal_size
 from typing import Optional
 from fractions import Fraction
-from bigint_tools import to_scientific, scientific_length_max
+from bigint_tools import to_scientific, to_percent, scientific_length_max, percent_length_max
 import argparse
 
 
@@ -33,17 +33,12 @@ def make_bar(p: Fraction, max: int) -> str:
 
 def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False,
                prec: int = 2, invert: bool = False, min: Fraction = Fraction(0)) -> None:
-    if prec <= 0:
-        wper = 4
-        prec = 0
-    else:
-        wper = 5 + prec
     mode = int(n * p + p)
     max_pos = choose(n, mode)
     max_ratio = max_pos * p**mode * (1 - p)**(n - mode)
     wp = scientific_length_max(max_pos, prec)
     wn = len(str(n))
-    hist_width = get_width(term_width) - 6 - wp - wn - 3 * wper
+    hist_width = get_width(term_width) - 6 - wp - wn - 3 * percent_length_max(prec)
     accum_p = Fraction(0)
     accum_m = Fraction(1)
     pos = 1
@@ -58,9 +53,9 @@ def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulate
             accum_m -= ratio
             continue
         desc = f"{i:{wn}}: {to_scientific(pos, prec, wp)}"\
-            + f" {float(ratio):{wper}.{prec}%}"\
-            + f" {float(accum_p):{wper}.{prec}%}"\
-            + f" {float(accum_m):{wper}.{prec}%} "
+            + f" {to_percent(ratio, prec)}"\
+            + f" {to_percent(accum_p, prec)}"\
+            + f" {to_percent(accum_m, prec)} "
         relative_length = ratio / max_ratio
         if accumulated and not invert:
             relative_length = accum_p
