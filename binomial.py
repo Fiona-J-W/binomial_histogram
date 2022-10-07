@@ -25,7 +25,7 @@ def get_width(term_width: Optional[int]) -> int:
 def make_bar(p: Fraction, max: int) -> str:
     l8 = round(p*max*8)
     ld, lm =divmod(l8, 8)
-    end = ['', '▏', '▎', '▍', '▌', '▋', '▊', '▉'][lm]
+    end = ['', '▏', '▎', '▍', '▌', '▋', '▉', '▊'][lm]
     return '█' * ld + end
 
 
@@ -36,6 +36,7 @@ def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated
     max_ratio = choose(n, mode) * p**mode * (1-p)**(n-mode)
     hist_width = get_width(term_width) - 27 - wp - wn
     accum_p = Fraction(0)
+    accum_m = Fraction(1)
     pos = 1
     ratio = (1-p)**n
     for i in range(0, n+1):
@@ -45,13 +46,17 @@ def print_hist(n:int, p: Fraction, term_width: Optional[int] = None, accumulated
             ratio = ratio * pos * p / pos_prev / (1-p)
         accum_p += ratio
         if ratio < min:
+            accum_m -= ratio
             continue
-        desc = f"{i:{wn}}: {pos:{wp}} {float(ratio):7.2%} {float(accum_p):7.2%} {float(1-accum_p):7.2%} "
-        relative_length = ratio/max_ratio if not accumulated else accum_p
-        if invert:
-            relative_length = 1 - relative_length
+        desc = f"{i:{wn}}: {pos:{wp}} {float(ratio):7.2%} {float(accum_p):7.2%} {float(accum_m):7.2%} "
+        relative_length = ratio/max_ratio
+        if accumulated and not invert:
+            relative_length = accum_p
+        elif accumulated and invert:
+            relative_length = accum_m
         bar = make_bar(relative_length, hist_width)
         print(desc + bar)
+        accum_m -= ratio
 
 
 def main(args: list[str]) -> int:
