@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 
-from math import factorial
+from math import comb
 from functools import reduce
 from operator import mul
 from os import get_terminal_size
@@ -8,11 +8,6 @@ from typing import Optional
 from fractions import Fraction
 from bigint_tools import to_scientific, to_percent, scientific_length_max, percent_length_max
 import argparse
-
-
-def choose(n: int, k: int) -> int:
-    assert n >= k >= 0
-    return reduce(mul, range(n - k + 1, n + 1), 1) // factorial(k)
 
 
 def get_width(term_width: Optional[int]) -> int:
@@ -36,7 +31,7 @@ def make_bar(p: Fraction, max: int) -> str:
 def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulated: bool = False,
                prec: int = 2, invert: bool = False, min: Fraction = Fraction(0)) -> None:
     mode = int(n * p + p)
-    max_pos = choose(n, mode)
+    max_pos = comb(n, mode)
     max_ratio = max_pos * p**mode * (1 - p)**(n - mode)
     wp = scientific_length_max(max_pos, prec)
     wn = len(str(n))

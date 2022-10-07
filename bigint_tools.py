@@ -43,6 +43,8 @@ def comp_digits(n: int) -> int:
 def scientific_length_max(n: int, prec: int) -> int:
     raw_length = comp_digits(n)
     exp_space = comp_digits(raw_length)
+    if prec == 0:
+        return min(4+exp_space, raw_length)
     return min(5 + prec + exp_space, raw_length)
 
 def to_scientific(n: int, prec: int = 2, space: int = 10) -> str:
@@ -55,7 +57,10 @@ def to_scientific(n: int, prec: int = 2, space: int = 10) -> str:
     leading_digit = leading[0]
     decimals=leading[1:]
     exp = to_exp(digits-1, exp_space)
-    return f"{leading_digit}.{decimals}⋅10{exp}"
+    if prec == 0:
+        return f"{leading_digit}⋅10{exp}"
+    else:
+        return f"{leading_digit}.{decimals}⋅10{exp}"
 
 def percent_length_max(prec: int) -> int:
     return 4 if prec <= 0 else 5+prec
