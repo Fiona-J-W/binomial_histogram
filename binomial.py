@@ -34,7 +34,11 @@ def print_hist(n: int, p: Fraction, term_width: Optional[int] = None, accumulate
                prec: int = 2, invert: bool = False, min: Fraction = Fraction(0)) -> None:
     wp = len(str(choose(n, n // 2)))
     wn = len(str(n))
-    wper = 5 + prec
+    if prec <= 0:
+        wper = 4
+        prec = 0
+    else:
+        wper = 5 + prec
     mode = int(n * p + p)
     max_ratio = choose(n, mode) * p**mode * (1 - p)**(n - mode)
     hist_width = get_width(term_width) - 6 - wp - wn - 3 * wper
