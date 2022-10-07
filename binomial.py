@@ -26,7 +26,7 @@ def get_width(term_width: Optional[int]) -> int:
 def make_bar(p: Fraction, max: int) -> str:
     l8 = round(p * max * 8)
     ld, lm = divmod(l8, 8)
-    end = ['', '▏', '▎', '▍', '▌', '▋', '▉', '▊'][lm]
+    end = ['', '▏', '▎', '▍', '▌', '▋', '▊', '▉'][lm]
     return '█' * ld + end
 
 
