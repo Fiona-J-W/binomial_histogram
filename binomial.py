@@ -92,7 +92,7 @@ def main(args: list[str]) -> int:
                         help="invert the lengths of the printed bars")
     parser.add_argument('-m', "--min",
                         type=Fraction, default=Fraction(0),
-                        help="minimum probability needed for a value to be printed")
+                        help="minimum probability in percent needed for a value to be printed")
     parsed = parser.parse_args()
     p = parsed.probability
     if not 0 <= p <= 1:
@@ -103,7 +103,7 @@ def main(args: list[str]) -> int:
                term_width=parsed.width,
                accumulated=parsed.accumulate,
                invert=parsed.invert,
-               min=parsed.min)
+               min=parsed.min/100)
     return 0
 
 
