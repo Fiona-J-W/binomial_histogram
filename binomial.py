@@ -3,16 +3,17 @@
 from math import factorial
 from functools import reduce
 from operator import mul
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Callable
 from fractions import Fraction
 from binomial.stringify import to_scientific, to_percent, scientific_length_max, percent_length_max
 import argparse
 
 from binomial import choose, comp_hist, get_width, bar_styles
 
+Filter = Callable[[Fraction, Fraction], bool]
 
 def print_hist(n: int, p: Fraction, term_width: Optional[int] = None,
-               prec: int = 2, min: Fraction = Fraction(0), style: str = 'normal') -> None:
+        prec: int = 2, filter: Filter = lambda x,y:True, style: str = 'normal') -> None:
     max_pos = choose(n, n // 2)
     mode = int(n * p + p)
     max_ratio = choose(n, mode) * p**mode * (1 - p)**(n - mode)
@@ -21,7 +22,7 @@ def print_hist(n: int, p: Fraction, term_width: Optional[int] = None,
     hist_width = get_width(term_width) - 6 - wp - wn - \
         3 * percent_length_max(prec)
     for i, pos, ratio, acc in comp_hist(n, p):
-        if ratio < min:
+        if not filter(ratio, acc):
             continue
         desc = f"{i:{wn}}: {to_scientific(pos, prec, wp)}"\
             + f" {to_percent(ratio, prec)}"\
@@ -61,7 +62,7 @@ def main(args: list[str]) -> int:
                prec=parsed.precission,
                term_width=parsed.width,
                style=parsed.style,
-               min=parsed.min / 100)
+               filter=lambda r,acc: bool(min(acc, 1-acc+r) > (parsed.min / 100)))
     return 0
 
 
