@@ -1,0 +1,9 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "binomial_histogram"
+version = "0.0.1"
+dependencies = []
+

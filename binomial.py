@@ -1,9 +1,6 @@
 #! /usr/bin/python3
 
-from math import factorial
-from functools import reduce
-from operator import mul
-from typing import Optional, Iterable, Callable
+from typing import Optional, Callable
 from fractions import Fraction
 from binomial.stringify import to_scientific, to_percent, scientific_length_max, percent_length_max
 import argparse
